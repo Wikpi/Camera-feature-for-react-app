@@ -1,0 +1,14 @@
+---------------------------------------------
+		Release Notes
+---------------------------------------------
+
+v. 0.0.1
+Changes:
+	added camera feature
+	user can now choose to input from local storage
+	added watermarking feature
+
+v. 0.0.2
+Changes: 
+	fixed code naming
+	made only 1 watermarking function

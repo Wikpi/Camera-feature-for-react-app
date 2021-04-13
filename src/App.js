@@ -29,56 +29,56 @@ const useStyles = makeStyles((theme) => ({
 function App() {
   const classes = useStyles();
 
-  const [inputSource, setinputSource] = useState("");
+  const [inputSource, setInputSource] = useState("");
 
   const handleInput = (target) => {
     if (target.files) {
       if (target.files.length !== 0) {
         const file = target.files[0];
         const newUrl = URL.createObjectURL(file);
-        setinputSource(newUrl);
+        setInputSource(newUrl);
       }
     }
   };
 
-  var CompanyName = "CompanyName";
+  var companyName = "CompanyName";
 
   var waterMarkedCamera = document.getElementById("waterMarkedCamera");
   var waterMarkedImage = document.getElementById("waterMarkedImage");
 
-  const [capturedPhoto, setcapturedPhoto] = useState("");
+  const [capturedPhoto, setCapturedPhoto] = useState("");
 
   const [inputResults, setInputResults] = useState(false);
-  const [cameraResults, setcameraResults] = useState(false);
+  const [cameraResults, setCameraResults] = useState(false);
 
-  const [CameraON, setCameraON] = useState(false);
+  const [cameraON, setCameraON] = useState(false);
   const cam = useRef(null);
 
   // Makes watermarking buttons appear
-  const AppearForINput = () => {
+  const appearForInput = () => {
     return setInputResults(true);
   };
 
   // Makes watermarking buttons appear
-  const AppearForCamera = () => {
-    return setcameraResults(true);
+  const appearForCamera = () => {
+    return setCameraResults(true);
   };
 
   // Capturing (setting captured pic to a variable)
   const capture = (imgSrc) => {
     console.log(imgSrc);
-    setcapturedPhoto(imgSrc);
+    setCapturedPhoto(imgSrc);
   };
 
   // Function for turning on the camera
-  const CameraTurnOn = () => {
-    setcameraResults(false);
+  const cameraTurnOn = () => {
+    setCameraResults(false);
     return setCameraON(true);
   };
 
   // Function for turning off the camera
-  const CameraTurnOff = () => {
-    AppearForCamera();
+  const cameraTurnOff = () => {
+    appearForCamera();
     return setCameraON(false);
   };
 
@@ -98,76 +98,50 @@ function App() {
     myCurrentDate.getSeconds() +
     " ";
 
-  // Put watermark on camera picture top right
-  const cameraWatermarkTopRight = (cp, d, cn, wmc) => {
-    watermark([cp])
-      .image(watermark.text.upperRight(d + cn, "10px Arial", "#fff", 0.5))
-      .then(function (img) {
-        wmc.replaceChild(wmc.appendChild(img), wmc.childNodes[0]);
-      });
-  };
+  const topLeft = 1;
+  const topRight = 2;
+  const bottomLeft = 3;
+  const bottomRight = 4;
 
-  // Put watermark on camera picture top left
-  const cameraWatermarkTopLeft = (cp, d, cn, wmc) => {
-    watermark([cp])
-      .image(watermark.text.upperLeft(d + cn, "10px Arial", "#fff", 0.5))
-      .then(function (img) {
-        wmc.replaceChild(wmc.appendChild(img), wmc.childNodes[0]);
-      });
-  };
-
-  // Put watermark on camera picture bottom right
-  const cameraWatermarkBottomRight = (cp, d, cn, wmc) => {
-    watermark([cp])
-      .image(watermark.text.lowerRight(d + cn, "10px Arial", "#fff", 0.5))
-      .then(function (img) {
-        wmc.replaceChild(wmc.appendChild(img), wmc.childNodes[0]);
-      });
-  };
-
-  // Put watermark on camera picture bottom left
-  const cameraWatermarkBottomLeft = (cp, d, cn, wmc) => {
-    watermark([cp])
-      .image(watermark.text.lowerLeft(d + cn, "10px Arial", "#fff", 0.5))
-      .then(function (img) {
-        wmc.replaceChild(wmc.appendChild(img), wmc.childNodes[0]);
-      });
-  };
-
-  // Put watermark on input picture top right
-  const imageWatermarkTopRight = (is, d, cn, wmi) => {
-    watermark([is])
-      .image(watermark.text.upperRight(d + cn, "10px Arial", "#fff", 0.5))
-      .then(function (img) {
-        wmi.replaceChild(wmi.appendChild(img), wmi.childNodes[0]);
-      });
-  };
-
-  // Put watermark on input picture top left
-  const imageWatermarkTopLeft = (is, d, cn, wmi) => {
-    watermark([is])
-      .image(watermark.text.upperLeft(d + cn, "10px Arial", "#fff", 0.5))
-      .then(function (img) {
-        wmi.replaceChild(wmi.appendChild(img), wmi.childNodes[0]);
-      });
-  };
-
-  // Put watermark on input picture bottom right
-  const imageWatermarkBottomRight = (is, d, cn, wmi) => {
-    watermark([is])
-      .image(watermark.text.lowerRight(d + cn, "10px Arial", "#fff", 0.5))
-      .then(function (img) {
-        wmi.replaceChild(wmi.appendChild(img), wmi.childNodes[0]);
-      });
-  };
-
-  // Put watermark on input picture bottom left
-  const imageWatermarkBottomLeft = (is, d, cn, wmi) => {
-    watermark([is])
-      .image(watermark.text.lowerLeft(d + cn, "10px Arial", "#fff", 0.5))
-      .then(function (img) {
-        wmi.replaceChild(wmi.appendChild(img), wmi.childNodes[0]);
-      });
+  // Function for adding watermarks to images
+  const addWatermark = (image, pos, d, cn, callbackfn) => {
+    var watermarkText;
+    switch (pos) {
+      default:
+      case topLeft:
+        watermarkText = watermark.text.upperLeft(
+          d + cn,
+          "10px Arial",
+          "#fff",
+          0.5
+        );
+        break;
+      case topRight:
+        watermarkText = watermark.text.upperRight(
+          d + cn,
+          "10px Arial",
+          "#fff",
+          0.5
+        );
+        break;
+      case bottomLeft:
+        watermarkText = watermark.text.lowerLeft(
+          d + cn,
+          "10px Arial",
+          "#fff",
+          0.5
+        );
+        break;
+      case bottomRight:
+        watermarkText = watermark.text.lowerRight(
+          d + cn,
+          "10px Arial",
+          "#fff",
+          0.5
+        );
+        break;
+    }
+    watermark([image]).image(watermarkText).then(callbackfn);
   };
 
   return (
@@ -181,12 +155,12 @@ function App() {
             color="primary"
             aria-label="upload picture"
             component="span"
-            onClick={CameraTurnOn}
+            onClick={cameraTurnOn}
           >
             <PhotoCameraRoundedIcon fontSize="large" color="primary" />
           </IconButton>
           <div>
-            {CameraON ? (
+            {cameraON ? (
               <Fragment>
                 <Camera
                   showFocus={true}
@@ -202,7 +176,7 @@ function App() {
                 <button onClick={(img) => cam.current.capture(img)}>
                   Take image
                 </button>
-                <button onClick={CameraTurnOff}>Turn off camera</button>
+                <button onClick={cameraTurnOff}>Turn off camera</button>
               </Fragment>
             ) : null}
           </div>
@@ -210,11 +184,17 @@ function App() {
             <div>
               <button
                 onClick={() =>
-                  cameraWatermarkTopRight(
+                  addWatermark(
                     capturedPhoto,
+                    topRight,
                     date,
-                    CompanyName,
-                    waterMarkedCamera
+                    companyName,
+                    (img) => {
+                      waterMarkedCamera.replaceChild(
+                        waterMarkedCamera.appendChild(img),
+                        waterMarkedCamera.childNodes[0]
+                      );
+                    }
                   )
                 }
               >
@@ -222,11 +202,17 @@ function App() {
               </button>
               <button
                 onClick={() =>
-                  cameraWatermarkTopLeft(
+                  addWatermark(
                     capturedPhoto,
+                    topLeft,
                     date,
-                    CompanyName,
-                    waterMarkedCamera
+                    companyName,
+                    (img) => {
+                      waterMarkedCamera.replaceChild(
+                        waterMarkedCamera.appendChild(img),
+                        waterMarkedCamera.childNodes[0]
+                      );
+                    }
                   )
                 }
               >
@@ -235,11 +221,17 @@ function App() {
               <br />
               <button
                 onClick={() =>
-                  cameraWatermarkBottomRight(
+                  addWatermark(
                     capturedPhoto,
+                    bottomRight,
                     date,
-                    CompanyName,
-                    waterMarkedCamera
+                    companyName,
+                    (img) => {
+                      waterMarkedCamera.replaceChild(
+                        waterMarkedCamera.appendChild(img),
+                        waterMarkedCamera.childNodes[0]
+                      );
+                    }
                   )
                 }
               >
@@ -247,11 +239,17 @@ function App() {
               </button>
               <button
                 onClick={() =>
-                  cameraWatermarkBottomLeft(
+                  addWatermark(
                     capturedPhoto,
+                    bottomLeft,
                     date,
-                    CompanyName,
-                    waterMarkedCamera
+                    companyName,
+                    (img) => {
+                      waterMarkedCamera.replaceChild(
+                        waterMarkedCamera.appendChild(img),
+                        waterMarkedCamera.childNodes[0]
+                      );
+                    }
                   )
                 }
               >
@@ -278,7 +276,7 @@ function App() {
             color="primary"
             aria-label="upload picture"
             component="span"
-            onClick={AppearForINput}
+            onClick={appearForInput}
           >
             <FolderIcon fontSize="large" color="primary" />
           </IconButton>
@@ -286,11 +284,17 @@ function App() {
             <div>
               <button
                 onClick={() =>
-                  imageWatermarkTopRight(
+                  addWatermark(
                     inputSource,
+                    topRight,
                     date,
-                    CompanyName,
-                    waterMarkedImage
+                    companyName,
+                    (img) => {
+                      waterMarkedImage.replaceChild(
+                        waterMarkedImage.appendChild(img),
+                        waterMarkedImage.childNodes[0]
+                      );
+                    }
                   )
                 }
               >
@@ -298,11 +302,17 @@ function App() {
               </button>
               <button
                 onClick={() =>
-                  imageWatermarkTopLeft(
+                  addWatermark(
                     inputSource,
+                    topLeft,
                     date,
-                    CompanyName,
-                    waterMarkedImage
+                    companyName,
+                    (img) => {
+                      waterMarkedImage.replaceChild(
+                        waterMarkedImage.appendChild(img),
+                        waterMarkedImage.childNodes[0]
+                      );
+                    }
                   )
                 }
               >
@@ -311,11 +321,17 @@ function App() {
               <br />
               <button
                 onClick={() =>
-                  imageWatermarkBottomRight(
+                  addWatermark(
                     inputSource,
+                    bottomRight,
                     date,
-                    CompanyName,
-                    waterMarkedImage
+                    companyName,
+                    (img) => {
+                      waterMarkedImage.replaceChild(
+                        waterMarkedImage.appendChild(img),
+                        waterMarkedImage.childNodes[0]
+                      );
+                    }
                   )
                 }
               >
@@ -323,11 +339,17 @@ function App() {
               </button>
               <button
                 onClick={() =>
-                  imageWatermarkBottomLeft(
+                  addWatermark(
                     inputSource,
+                    bottomLeft,
                     date,
-                    CompanyName,
-                    waterMarkedImage
+                    companyName,
+                    (img) => {
+                      waterMarkedImage.replaceChild(
+                        waterMarkedImage.appendChild(img),
+                        waterMarkedImage.childNodes[0]
+                      );
+                    }
                   )
                 }
               >
