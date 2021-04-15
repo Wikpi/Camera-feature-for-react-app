@@ -10,6 +10,17 @@ import * as watermark from "watermarkjs";
 const useStyles = makeStyles((theme) => ({
   root: {
     height: "100%",
+    display: "table",
+    justifyContent: "center",
+    marginTop: "5%",
+    marginRight: "auto",
+    marginLeft:"10%"
+  },
+  cameraDiv: {
+    width: "100%",
+  },
+  inputDiv: {
+    width: "100%",
   },
   imgBox: {
     maxWidth: "80%",
@@ -17,8 +28,8 @@ const useStyles = makeStyles((theme) => ({
     margin: "10px",
   },
   img: {
-    height: "inherit",
-    maxWidth: "inherit",
+    width: "100%",
+    height: "auto"
   },
   input: {
     display: "none",
@@ -29,24 +40,31 @@ const useStyles = makeStyles((theme) => ({
 function App() {
   const classes = useStyles();
 
-  const [inputSource, setInputSource] = useState("");
+  var companyName = "CompanyName";
+
+  // var waterMarkedCamera = document.getElementById("waterMarkedCamera");
+  // var waterMarkedImage = document.getElementById("waterMarkedImage");
+
+  const emptyImg = "data:image/jpg;base64";
+
+  const [inputDisabled, setInputDisabled] = useState(false);
+  const [selectedImage, setSelectedImage] = useState(emptyImg);
+  const [selectedWatermarkedImage, setSelectedWatermarkedImage] = useState(emptyImg);
 
   const handleInput = (target) => {
+    console.log("~~~ handleInput");
     if (target.files) {
       if (target.files.length !== 0) {
         const file = target.files[0];
         const newUrl = URL.createObjectURL(file);
-        setInputSource(newUrl);
+        setSelectedImage(newUrl);
+        setInputResults(true);
       }
     }
   };
 
-  var companyName = "CompanyName";
-
-  var waterMarkedCamera = document.getElementById("waterMarkedCamera");
-  var waterMarkedImage = document.getElementById("waterMarkedImage");
-
-  const [capturedPhoto, setCapturedPhoto] = useState("");
+  const [capturedPhoto, setCapturedPhoto] = useState(emptyImg);
+  const [capturedWatermarkedPhoto, setCapturedWatermarkedPhoto] = useState(emptyImg);
 
   const [inputResults, setInputResults] = useState(false);
   const [cameraResults, setCameraResults] = useState(false);
@@ -54,20 +72,28 @@ function App() {
   const [cameraON, setCameraON] = useState(false);
   const cam = useRef(null);
 
-  // Makes watermarking buttons appear
-  const appearForInput = () => {
-    return setInputResults(true);
-  };
-
-  // Makes watermarking buttons appear
-  const appearForCamera = () => {
-    return setCameraResults(true);
-  };
-
+  
   // Capturing (setting captured pic to a variable)
   const capture = (imgSrc) => {
     console.log(imgSrc);
+    setCameraResults(true);
     setCapturedPhoto(imgSrc);
+  };
+
+  const clearCapturedImg = () => {
+    console.log(emptyImg);
+    setCapturedPhoto(emptyImg);
+    setCapturedWatermarkedPhoto(emptyImg);
+    setCameraResults(false);
+  };
+
+  const clearSelectedImg = () => {
+    console.log(emptyImg);
+    setInputDisabled(true); 
+    setSelectedImage(emptyImg);
+    setSelectedWatermarkedImage(emptyImg);
+    setInputResults(false);
+    setTimeout(()=>{setInputDisabled(false)},5);
   };
 
   // Function for turning on the camera
@@ -78,7 +104,6 @@ function App() {
 
   // Function for turning off the camera
   const cameraTurnOff = () => {
-    appearForCamera();
     return setCameraON(false);
   };
 
@@ -110,55 +135,39 @@ function App() {
       default:
       case topLeft:
         watermarkText = watermark.text.upperLeft(
-          d + cn,
-          "10px Arial",
-          "#fff",
-          0.5
-        );
+          d + cn, "10px Arial", "#fff", 0.5 );
         break;
       case topRight:
         watermarkText = watermark.text.upperRight(
-          d + cn,
-          "10px Arial",
-          "#fff",
-          0.5
-        );
+          d + cn, "10px Arial", "#fff", 0.5 );
         break;
       case bottomLeft:
         watermarkText = watermark.text.lowerLeft(
-          d + cn,
-          "10px Arial",
-          "#fff",
-          0.5
-        );
+          d + cn, "10px Arial", "#fff", 0.5 );
         break;
       case bottomRight:
         watermarkText = watermark.text.lowerRight(
-          d + cn,
-          "10px Arial",
-          "#fff",
-          0.5
-        );
+          d + cn, "10px Arial", "#fff", 0.5 );
         break;
     }
+    //console.log("~~~ addWatermark: "+watermarkText);
     watermark([image]).image(watermarkText).then(callbackfn);
   };
 
+  const watermarkCallback = (img) => {
+    console.log("~~~ watermarkCallback");
+    setCapturedWatermarkedPhoto(img.src);
+  }
+
+  const watermarkCallback2 = (img) => {
+    console.log("~~~ watermarkCallback2");
+    setSelectedWatermarkedImage(img.src);
+  }
+
   return (
     <div className={classes.root}>
-      <div>
-        <h5>Captured image</h5>
-        <img src={capturedPhoto} alt={""} className={classes.img}></img>
-        <br />
+      <div className={classes.cameraDiv}>
         <label htmlFor="camera">
-          <IconButton
-            color="primary"
-            aria-label="upload picture"
-            component="span"
-            onClick={cameraTurnOn}
-          >
-            <PhotoCameraRoundedIcon fontSize="large" color="primary" />
-          </IconButton>
           <div>
             {cameraON ? (
               <Fragment>
@@ -177,188 +186,102 @@ function App() {
                   Take image
                 </button>
                 <button onClick={cameraTurnOff}>Turn off camera</button>
+                <button onClick={clearCapturedImg}>Clear</button>
               </Fragment>
-            ) : null}
+            ) : 
+            <>
+            <IconButton
+              color="primary"
+              aria-label="upload picture"
+              component="span"
+              onClick={cameraTurnOn} >
+              <PhotoCameraRoundedIcon fontSize="large" color="primary" />
+            </IconButton>
+            click to turn camera on
+            </>
+            }
           </div>
+          <h5>Captured image</h5>
+          <img src={capturedPhoto} alt={""} className={classes.img}></img>
+          <br />
           {cameraResults ? (
             <div>
-              <button
-                onClick={() =>
-                  addWatermark(
-                    capturedPhoto,
-                    topRight,
-                    date,
-                    companyName,
-                    (img) => {
-                      waterMarkedCamera.replaceChild(
-                        waterMarkedCamera.appendChild(img),
-                        waterMarkedCamera.childNodes[0]
-                      );
-                    }
-                  )
-                }
-              >
+              <button onClick={() =>
+                  addWatermark(capturedPhoto, topRight, date, companyName, watermarkCallback) } >
                 Watermark top right
               </button>
-              <button
-                onClick={() =>
-                  addWatermark(
-                    capturedPhoto,
-                    topLeft,
-                    date,
-                    companyName,
-                    (img) => {
-                      waterMarkedCamera.replaceChild(
-                        waterMarkedCamera.appendChild(img),
-                        waterMarkedCamera.childNodes[0]
-                      );
-                    }
-                  )
-                }
-              >
+              <button onClick={() =>
+                  addWatermark(capturedPhoto, topLeft, date, companyName, watermarkCallback) } >
                 Watermark top left
               </button>
               <br />
-              <button
-                onClick={() =>
-                  addWatermark(
-                    capturedPhoto,
-                    bottomRight,
-                    date,
-                    companyName,
-                    (img) => {
-                      waterMarkedCamera.replaceChild(
-                        waterMarkedCamera.appendChild(img),
-                        waterMarkedCamera.childNodes[0]
-                      );
-                    }
-                  )
-                }
-              >
+              <button onClick={() =>
+                  addWatermark(capturedPhoto, bottomRight, date, companyName, watermarkCallback) } >
                 Watermark bottom right
               </button>
-              <button
-                onClick={() =>
-                  addWatermark(
-                    capturedPhoto,
-                    bottomLeft,
-                    date,
-                    companyName,
-                    (img) => {
-                      waterMarkedCamera.replaceChild(
-                        waterMarkedCamera.appendChild(img),
-                        waterMarkedCamera.childNodes[0]
-                      );
-                    }
-                  )
-                }
-              >
+              <button onClick={() =>
+                  addWatermark(capturedPhoto, bottomLeft, date, companyName, watermarkCallback) } >
                 Watermark bottom left
               </button>
             </div>
           ) : null}
         </label>
-        <div id="waterMarkedCamera" />
+        <div>
+        <img src={capturedWatermarkedPhoto} alt={""} className={classes.img}></img>
+        </div>
       </div>
-      <div>
-        <h5>Inputted image</h5>
-        <img src={inputSource} alt={""} className={classes.img}></img>
-        <br />
+
+      {/* image input/upload */}
+
+      <div className={classes.inputDiv}>
         <input
           accept="image/*"
           className={classes.input}
           id="pictureInput"
           type="file"
-          onChange={(e) => handleInput(e.target)}
-        />
+          disabled={inputDisabled}
+          onChange={(e) => handleInput(e.target)} />
+
         <label htmlFor="pictureInput">
           <IconButton
             color="primary"
             aria-label="upload picture"
-            component="span"
-            onClick={appearForInput}
-          >
+            component="span">
             <FolderIcon fontSize="large" color="primary" />
           </IconButton>
+          click to select image from storage
+
+          <h5>Selected image</h5>
+          <img src={selectedImage} alt={""} className={classes.img}></img>
+          <br />
+
           {inputResults ? (
             <div>
-              <button
-                onClick={() =>
-                  addWatermark(
-                    inputSource,
-                    topRight,
-                    date,
-                    companyName,
-                    (img) => {
-                      waterMarkedImage.replaceChild(
-                        waterMarkedImage.appendChild(img),
-                        waterMarkedImage.childNodes[0]
-                      );
-                    }
-                  )
-                }
-              >
+              <button onClick={() =>
+                  addWatermark(selectedImage, topRight, date, companyName, watermarkCallback2) }>
                 Watermark top right
               </button>
-              <button
-                onClick={() =>
-                  addWatermark(
-                    inputSource,
-                    topLeft,
-                    date,
-                    companyName,
-                    (img) => {
-                      waterMarkedImage.replaceChild(
-                        waterMarkedImage.appendChild(img),
-                        waterMarkedImage.childNodes[0]
-                      );
-                    }
-                  )
-                }
-              >
+              <button onClick={() =>
+                  addWatermark(selectedImage, topLeft, date, companyName, watermarkCallback2) }>
                 Watermark top left
               </button>
               <br />
-              <button
-                onClick={() =>
-                  addWatermark(
-                    inputSource,
-                    bottomRight,
-                    date,
-                    companyName,
-                    (img) => {
-                      waterMarkedImage.replaceChild(
-                        waterMarkedImage.appendChild(img),
-                        waterMarkedImage.childNodes[0]
-                      );
-                    }
-                  )
-                }
-              >
+              <button onClick={() =>
+                  addWatermark(selectedImage, bottomRight, date, companyName, watermarkCallback2) }>
                 Watermark bottom right
               </button>
-              <button
-                onClick={() =>
-                  addWatermark(
-                    inputSource,
-                    bottomLeft,
-                    date,
-                    companyName,
-                    (img) => {
-                      waterMarkedImage.replaceChild(
-                        waterMarkedImage.appendChild(img),
-                        waterMarkedImage.childNodes[0]
-                      );
-                    }
-                  )
-                }
-              >
+              <button onClick={() =>
+                  addWatermark(selectedImage, bottomLeft, date, companyName, watermarkCallback2) }>
                 Watermark bottom left
               </button>
+              <br/>
+              <button onClick={clearSelectedImg}>Clear</button>
             </div>
           ) : null}
-        </label>
-        <div id="waterMarkedImage" />
+          </label>
+        <div>
+          <img src={selectedWatermarkedImage} alt={""} className={classes.img}></img>
+        </div>
       </div>
     </div>
   );
