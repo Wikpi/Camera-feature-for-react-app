@@ -12,3 +12,8 @@ v. 0.0.2
 Changes: 
 	fixed code naming
 	made only 1 watermarking function
+
+v. 0.0.3
+Changes:
+	made buttons to choose what the text colour will be
+	watermark text size changes according to image size
