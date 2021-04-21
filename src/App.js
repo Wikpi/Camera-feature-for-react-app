@@ -5,7 +5,7 @@ import PhotoCameraRoundedIcon from "@material-ui/icons/PhotoCameraRounded";
 import FolderIcon from "@material-ui/icons/Folder";
 import { Camera } from "react-cam";
 import * as watermark from "watermarkjs";
-import { dimensions } from "./dimensions";
+import { getImageWidth, getImageHeight } from "./dimensions";
 
 // Styling
 const useStyles = makeStyles((theme) => ({
@@ -144,9 +144,11 @@ function App() {
   // Function for adding watermarks to images
   const addWatermark = (image, pos, d, cn, callbackfn, textColour) => {
     var watermarkText;
-    var imageWidth = dimensions(image).width;
+    var imageWidth = getImageWidth(image).width;
+    var imageHeight = getImageHeight(image).height;
     // console.log(imageWidth);
     var size = (3 / 100) * imageWidth;
+    var textPlacementHeight = 100;
     //console.log(size);
     var numb = size.toString() + "px";
     var textSize = numb + " Arial";
@@ -159,7 +161,8 @@ function App() {
           d + cn,
           textSize,
           textColour,
-          0.5
+          0.7,
+          textPlacementHeight
         );
         break;
       case topRight:
@@ -167,7 +170,8 @@ function App() {
           d + cn,
           textSize,
           textColour,
-          0.5
+          0.5,
+          textPlacementHeight
         );
         break;
       case bottomLeft:
