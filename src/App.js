@@ -136,13 +136,6 @@ function App() {
   const bottomLeft = 3;
   const bottomRight = 4;
 
-  function get_tex_width(txt) {
-    this.element = document.createElement("canvas");
-    this.context = this.element.getContext("2d");
-    //this.context.font = font;
-    return this.context.measureText(txt).width;
-  }
-
   //Change colour
   const changeColour = (givenColour) => {
     setColour(givenColour);
