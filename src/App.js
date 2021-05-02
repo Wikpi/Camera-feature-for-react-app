@@ -136,6 +136,13 @@ function App() {
   const bottomLeft = 3;
   const bottomRight = 4;
 
+  function get_tex_width(txt) {
+    this.element = document.createElement("canvas");
+    this.context = this.element.getContext("2d");
+    //this.context.font = font;
+    return this.context.measureText(txt).width;
+  }
+
   //Change colour
   const changeColour = (givenColour) => {
     setColour(givenColour);
@@ -144,11 +151,26 @@ function App() {
   // Function for adding watermarks to images
   const addWatermark = (image, pos, d, cn, callbackfn, textColour) => {
     var watermarkText;
+    var textWidth;
+    var textHeight;
     var imageWidth = getImageWidth(image).width;
     var imageHeight = getImageHeight(image).height;
     // console.log(imageWidth);
-    var size = (3 / 100) * imageWidth;
-    var textPlacementHeight = 100;
+    console.log(imageHeight);
+    console.log(imageWidth);
+    if (imageHeight >= 500 || imageWidth >= 500) {
+      textHeight = (imageHeight * 0.3) / 100;
+      textWidth = (imageWidth * 0.3) / 100;
+    } else {
+      textHeight = (imageHeight * 1.0) / 100;
+      textWidth = (imageWidth * 1.0) / 100;
+    }
+
+    // console.log(textWidth);
+
+    var size = textWidth * textHeight;
+    // console.log(size);
+    var textPlacementHeight = size;
     //console.log(size);
     var numb = size.toString() + "px";
     var textSize = numb + " Arial";
